@@ -12,8 +12,23 @@ var UserModel = Backbone.Model.extend({
 	}
 });
 
-var FriendModel = Backbone.Model.extend({
-	urlRoot: '/friendships'
+var FriendshipModel = Backbone.Model.extend({
+	urlRoot: '/friendships',
+	sync: function(method, model, options) {
+		options || (options = {});
+		switch(method){
+			case 'create':
+				options.url = this.urlRoot + '/' + model.attributes.friendID;
+			break;
+		}
+		return Backbone.sync(method, model, options);
+	}
+});
+
+
+
+var FrienshipRequests = Backbone.Model.extend({
+	urlRoot: '/requested',
 });
 
 var ProfileView = Backbone.View.extend({
@@ -47,13 +62,14 @@ var UsersList = Backbone.Collection.extend({
 	model: UserModel
 });
 
-var FriendsList = UsersList.extend({
-	url: '/friendships/me'
+var FriendsList = Backbone.Collection.extend({
+	url: '/friendships/me',
+	model: FriendshipModel
 });
 
-var UserTemplate = _.template('<div id="user_<%= id %>"><%= name %> <a class="addFriend" href="#"> add as friend </a></div>');
+var UserTemplate = _.template('<span id="user_<%= id %>"><%= name %> <a class="addFriend" href="#"> add as friend </a></span>');
 
-var UsersCollectionView = Backbone.View.extend({	
+var CollectionView = Backbone.View.extend({
 	initialize: function(options) {
 		this.template = options.template;
 		this.label = options.label;
@@ -67,19 +83,24 @@ var UsersCollectionView = Backbone.View.extend({
  			self.$el.append( self.template( user.attributes ) );
 		});		
 		console.log( this.label , this.collection.models );
-	},
+	}
+});
+
+var UsersCollectionView = CollectionView.extend({
 	events: {
 		'click .addFriend': function (event) {
 			console.log('add friend', event);
+
 			var index = this.$el.find('a.addFriend').index(event.currentTarget);
-			console.log('index', index);
-			var friend = new FriendModel( this.collection.at(index).attributes );
-			console.log('friend', friend.attributes );
-			friend.unset('id');
+			var user = this.collection.at(index);
+			var friend = new FriendshipModel( { friendID: user.get('id') } );
+			
 			friend.save();
 		}
 	}
+});
 
+var FriendshipsCollectionView = CollectionView.extend({	
 });
 
 
@@ -90,7 +111,7 @@ var Users = new UsersList();
 var myProfileView = new ProfileView( { model: myProfile } );
 
 var allUsersCollection = new UsersCollectionView({ collection: Users, el: '#allUsers', label: 'Users List', template: UserTemplate });
-var myFriendsCollection = new UsersCollectionView({ collection: myFriends, label: 'Friends List' });
+var myFriendsCollection = new FriendshipsCollectionView({ collection: myFriends, el: '#myFriends', label: 'Friends List' });
 
 
 myProfileView.update();
