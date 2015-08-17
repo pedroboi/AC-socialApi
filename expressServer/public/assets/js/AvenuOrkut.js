@@ -26,7 +26,6 @@ var FriendshipModel = Backbone.Model.extend({
 });
 
 
-
 var FrienshipRequests = Backbone.Model.extend({
 	urlRoot: '/requested',
 });
@@ -101,6 +100,17 @@ var UsersCollectionView = CollectionView.extend({
 });
 
 var FriendshipsCollectionView = CollectionView.extend({	
+	events: {
+		'click .addFriend': function (event) {
+			console.log('add friend', event);
+			var index = this.$el.find('a.addFriend').index(event.currentTarget);
+			console.log('index', index);
+			var friend = new FriendModel( this.collection.at(index).attributes );
+			console.log('friend', friend.attributes );
+			friend.unset('id');
+			friend.save();
+		}
+	}
 });
 
 
@@ -112,6 +122,5 @@ var myProfileView = new ProfileView( { model: myProfile } );
 
 var allUsersCollection = new UsersCollectionView({ collection: Users, el: '#allUsers', label: 'Users List', template: UserTemplate });
 var myFriendsCollection = new FriendshipsCollectionView({ collection: myFriends, el: '#myFriends', label: 'Friends List' });
-
 
 myProfileView.update();
