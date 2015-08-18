@@ -139,8 +139,8 @@ myProfileView.update();
 
 var AvenuOrkut = new (Backbone.Router.extend({
 	routes: { 
-		"": "index", 
-		"login": "login"
+		"*": "viewProfile",
+		"edit": "editProfile"
 	},
 	initialize: function(){			
 	},
@@ -148,18 +148,26 @@ var AvenuOrkut = new (Backbone.Router.extend({
 		Backbone.history.start({pushState: true});
 		console.log('AvenuOrkut started.');
 	},
-	index: function() {		
-		this.myProfile = new UserModel();
-		this.myProfileView = new ProfileView( { model: this.myProfile } );
+	viewProfile: function() {		
+		var myProfile = new UserModel();
+		var myProfileView = new ProfileView( { model: this.myProfile } );
 
-		this.Users = new UsersList();
-		this.allUsersCollection = new UsersCollectionView({ collection: this.Users, el: '#allUsers', label: 'Users List', template: UserTemplate });
-
-		this.myProfileView.update();
+		//this.Users = new UsersList();
+		//this.allUsersCollection = new UsersCollectionView({ collection: this.Users, el: '#allUsers', label: 'Users List', template: UserTemplate });
+		this.setView( myProfileView );
 	},	
-	login: function(){
-		
+	editProfile: function(){
+
+		//this.setView( myProfileView );		
+	},
+	setView: function( view ){
+		if( this.currentView ){
+			this.currentView.remove();
+		}		
+		this.currentView = view;
+		this.currentView.render().append('body');
 	}
+
 }));
 
 AvenuOrkut.start();
