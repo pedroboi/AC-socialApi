@@ -18,22 +18,18 @@ var FriendshipModel = Backbone.Model.extend({
 		options || (options = {});
 		switch(method){
 			case 'create':
-				options.url = this.urlRoot + '/' + model.attributes.friendID;
+			options.url = this.urlRoot + '/' + model.attributes.friendID;
 			break;
 		}
 		return Backbone.sync(method, model, options);
 	}
 });
 
-
-var FrienshipRequests = Backbone.Model.extend({
-	urlRoot: '/requested',
-});
-
 var ProfileView = Backbone.View.extend({
 	el: '#myProfile',
 	render: function() {
-		this.$el.html( '<img id="profilePicture" src="http://www.gravatar.com/avatar/' + this.model.get('md5') + '.jpg">' + this.model.get('name') );
+		this.$el.find('.panel-thumbnail').html('<img id="profilePicture" src="http://www.gravatar.com/avatar/' + this.model.get('md5') + '.jpg?s=200" class="img-responsive">')
+		this.$el.find('.lead').text( this.model.get('name') );
 		return this;
 	},
 	update: function() {
@@ -66,7 +62,20 @@ var FriendsList = Backbone.Collection.extend({
 	model: FriendshipModel
 });
 
-var UserTemplate = _.template('<span id="user_<%= id %>"><%= name %> <a class="addFriend" href="#"> add as friend </a></span>');
+var FriendsRequests = Backbone.Collection.extend({
+	url: '/friendships',
+	model: FriendshipModel,
+	parse: function( response ){
+		var selected = [];
+		$.each( response, function(index, value) {			
+       		console.log( value );
+       		selected.push( value );
+   		});
+		return selected;
+	}
+});
+
+var UserTemplate = _.template('<div class="col-sm-3" user_<%= id %>><img id="profilePicture" src="http://www.gravatar.com/avatar/<%= md5 %>.jpg"><%= name %> <a class="addFriend" href="#"> add as friend </a></span></div>');
 
 var CollectionView = Backbone.View.extend({
 	initialize: function(options) {
@@ -78,8 +87,10 @@ var CollectionView = Backbone.View.extend({
 	render: function() {
 		var self = this;		
 		this.$el.html('');
-		this.collection.forEach(function(user){
- 			self.$el.append( self.template( user.attributes ) );
+		this.collection.forEach(function(user, index){
+			if( index < 8 ) {			
+				self.$el.append( self.template( user.attributes ) );
+			}
 		});		
 		console.log( this.label , this.collection.models );
 	}
@@ -92,8 +103,7 @@ var UsersCollectionView = CollectionView.extend({
 
 			var index = this.$el.find('a.addFriend').index(event.currentTarget);
 			var user = this.collection.at(index);
-			var friend = new FriendshipModel( { friendID: user.get('id') } );
-			
+			var friend = new FriendshipModel( { friendID: user.get('id') } );			
 			friend.save();
 		}
 	}
@@ -113,7 +123,7 @@ var FriendshipsCollectionView = CollectionView.extend({
 	}
 });
 
-
+/*
 var myProfile = new UserModel();
 var myFriends = new FriendsList();
 var Users = new UsersList();
@@ -124,3 +134,32 @@ var allUsersCollection = new UsersCollectionView({ collection: Users, el: '#allU
 var myFriendsCollection = new FriendshipsCollectionView({ collection: myFriends, el: '#myFriends', label: 'Friends List' });
 
 myProfileView.update();
+
+*/
+
+var AvenuOrkut = new (Backbone.Router.extend({
+	routes: { 
+		"": "index", 
+		"login": "login"
+	},
+	initialize: function(){			
+	},
+	start: function(){
+		Backbone.history.start({pushState: true});
+		console.log('AvenuOrkut started.');
+	},
+	index: function() {		
+		this.myProfile = new UserModel();
+		this.myProfileView = new ProfileView( { model: this.myProfile } );
+
+		this.Users = new UsersList();
+		this.allUsersCollection = new UsersCollectionView({ collection: this.Users, el: '#allUsers', label: 'Users List', template: UserTemplate });
+
+		this.myProfileView.update();
+	},	
+	login: function(){
+		
+	}
+}));
+
+AvenuOrkut.start();

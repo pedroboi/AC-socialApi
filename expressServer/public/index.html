@@ -1,267 +1,165 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
-  <meta charset="UTF-8">
-  <title>Backbone Course</title>
-
-  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css"/>
-  <style type="text/css">
-    .margin-bottom {
-      margin-bottom: 10px;
-    }
-
-    .affix.fix-right {
-      right: 0;
-    }
-
-    .wrap {
-      word-break: break-all;
-    }
-  </style>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<title>Faceboot - A Facebook style template for Bootstrap</title>
+	<meta name="generator" content="Bootply" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="lib/css/bootstrap.min.css" rel="stylesheet" />
+<!--[if lt IE 9]>
+<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<link href="assets/css/styles.css" rel="stylesheet" />
 </head>
 <body>
+	<div class="wrapper">
+		<div class="box">
+			<div class="row row-offcanvas row-offcanvas-left">
 
-  <div class="container-fluid">
-    <div class="col-md-5">
-      <div class="panel panel-default">
-        <div class="panel-heading">Available Requests</div>
-        <div class="panel-body">
+				<!-- main right col -->
+				<div class="column col-xs-12" id="main">
 
-          <form class="form-inline margin-bottom">
-            <div class="form-group">
-              <label for="userId">UserId:</label>
-              <input type="text" name="userId" id="userId" class="form-control"/>
-            </div>
-            <div class="form-group">
-              <label for="queryUserName">Query:</label>
-              <input type="text" name="queryUserName" id="queryUserName" class="form-control"/>
-            </div>
-          </form>
+					<!-- top nav -->
+					<div class="navbar navbar-blue navbar-static-top">  
+						<div class="navbar-header">
+							<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+							<a href="/" class="navbar-brand logo">b</a>
+						</div>
+						<nav class="collapse navbar-collapse" role="navigation">
+							<form class="navbar-form navbar-left">
+								<div class="input-group input-group-sm" style="max-width:360px;">
+									<input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term">
+									<div class="input-group-btn">
+										<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+									</div>
+								</div>
+							</form>
+							<ul class="nav navbar-nav">
+								<li>
+									<a href="#"><i class="glyphicon glyphicon-home"></i> Home</a>
+								</li>
+								<li>
+									<a href="#postModal" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus"></i> Post</a>
+								</li>
+								<li>
+									<a href="#"><span class="badge">badge</span></a>
+								</li>
+							</ul>
+							<ul class="nav navbar-nav navbar-right">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i></a>
+									<ul class="dropdown-menu">
+										<li><a href="">More</a></li>
+										<li><a href="">More</a></li>
+										<li><a href="">More</a></li>
+										<li><a href="">More</a></li>
+										<li><a href="">More</a></li>
+									</ul>
+								</li>
+							</ul>
+						</nav>
+					</div>
+					<!-- /top nav -->
+					<div class="container full">
 
-          <div class="well margin-bottom">
-            <button onclick="listAllUsers()" class="btn btn-primary btn-block">List All Users</button>
-            <button onclick="getMe()" class="btn btn-primary btn-block">Get Current Logged User</button>
-            <button onclick="getUserById()" class="btn btn-primary btn-block">Get User by ID</button>
-            <button onclick="searchByName()" class="btn btn-primary btn-block">Search User By Name</button>
-            <button onclick="deleteUserById()" class="btn btn-primary btn-block">Delete User By ID</button>
-          </div>
+						<form class="form-signin">
+							<h2 class="form-signin-heading">Please sign in</h2>
+							<label for="inputEmail" class="sr-only">Email address</label>
+							<input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+							<label for="inputPassword" class="sr-only">Password</label>
+							<input type="password" id="inputPassword" class="form-control" placeholder="Password" required="">       
+							<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+						</form>
 
-          <h2 class="page-header">Login</h2>
-          <form class="form-horizontal margin-bottom" id="login" action="/login">
-            <div class="form-group">
-              <label for="username" class="col-md-2 control-label">User:</label>
-              <div class="col-md-10">
-                <input type="text" name="username" id="username" class="form-control"/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="password" class="col-md-2 control-label">Password:</label>
-              <div class="col-md-10">
-                <input type="text" name="password" id="password" class="form-control"/>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary pull-right">Log In</button>
-          </form>
-          <button onclick="logout()" class="btn btn-primary margin-bottom">Log out</button>
+						<div class="column col-xs-12" id="main">
+							<div class="col-sm-2">
+								<div id="myProfile" class="panel panel-default">
+									<div class="panel-thumbnail"></div>
+									<div class="panel-body">
+										<p class="lead"></p>										
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<p class="lead">Adicionar amigos</p>
+										<div id="allUsers"></div>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<p class="lead">Pedidos de amizade</p>
+										<p>As pessoas abaixo enviaram pedidos de amizade. Cuidado, talvez elas tenham segundas intenções!</p>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<p class="lead">Aguardando aprovação</p>
+										<p>Você enviou um pedido de amizade para estas pessoas mas elas ainda não aceitaram. Talvez elas não gostem de você!</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<p class="lead">Meus amigos</p>
+									</div>
+								</div>
+							</div>
+						</div>
 
-          <h2 class="page-header">Create User</h2>
-          <form class="form-horizontal margin-bottom" id="createUser" action="/users">
-            <div class="form-group">
-              <label for="name" class="col-md-2 control-label">Name:</label>
-              <div class="col-md-10">
-                <input type="text" name="name" id="name" class="form-control"/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="email" class="col-md-2 control-label">Email:</label>
-              <div class="col-md-10">
-                <input type="text" name="email" id="email" class="form-control"/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="password" class="col-md-2 control-label">Password:</label>
-              <div class="col-md-10">
-                <input type="password" name="password" class="form-control"/>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary pull-right">Create</button>
-          </form>
 
-          <h2 class="page-header">Change Password</h2>
-          <form class="form-horizontal margin-bottom" id="changePassword" action="/users">
-            <div class="form-group">
-              <label for="passwordUserId" class="col-md-4 control-label">User ID:</label>
-              <div class="col-md-8">
-                <input type="text" name="passwordUserId" id="passwordUserId" class="form-control"/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="oldPassword" class="col-md-4 control-label">Old Password:</label>
-              <div class="col-md-8">
-                <input type="password" name="oldPassword" id="oldPassword" class="form-control"/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="newPassword" class="col-md-4 control-label">New Password:</label>
-              <div class="col-md-8">
-                <input type="password" name="newPassword" id="newPassword" class="form-control"/>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary pull-right">Change</button>
-          </form>
-        </div>
-      </div>
-    </div>
+					</div><!-- /container -->
 
-    <div class="col-md-7 affix fix-right" data-spy="affix" data-offset-top="60">
-      <div class="panel panel-default">
-        <div class="panel-heading">Response From: <span id="requester"></span></div>
-        <div class="panel-body requestResult wrap">
 
-        </div>
-      </div>
+				</div>
+			</div>
+		</div>
 
-       <div class="panel panel-default">
-        <div class="panel-heading">Backbone Test: My Profile </div>
-        <div class="panel-body backboneTest wrap">
-          <div id="myProfile"></div>
-        </div>
-      </div>
 
-       <div class="panel panel-default">
-        <div class="panel-heading">Backbone Test: Users List </div>
-        <div class="panel-body backboneTest wrap">
-          <div id="allUsers"></div>
-        </div>
-      </div>
+		<!--post modal-->
+		<div id="postModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						Update Status
+					</div>
+					<div class="modal-body">
+						<form class="form center-block">
+							<div class="form-group">
+								<textarea class="form-control input-lg" autofocus="" placeholder="What do you want to share?"></textarea>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<button class="btn btn-primary btn-sm" data-dismiss="modal" aria-hidden="true">Post</button>
+							<ul class="pull-left list-inline"><li><a href=""><i class="glyphicon glyphicon-upload"></i></a></li><li><a href=""><i class="glyphicon glyphicon-camera"></i></a></li><li><a href=""><i class="glyphicon glyphicon-map-marker"></i></a></li></ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-      <div class="panel panel-default">
-        <div class="panel-heading">Backbone Test: My Friends</div>
-        <div class="panel-body backboneTest wrap">
-          <div id="myFriends"></div>
-        </div>
-      </div>
+		<!-- script references -->
+		<script type="text/javascript" src="lib/js/jquery.min.js"></script>
+		<script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
+		<script src="assets/js/scripts.js"></script>
 
-    </div>
-  </div>
+		<script type="text/javascript" src="./lib/js/md5/build/md5.min.js"></script>
+		<script type="text/javascript" src="./lib/js/json2/json2.js"></script>
 
-  <script type="text/javascript" src="lib/js/jquery.min.js"></script>
-  <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="lib/js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
+		<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
 
-  <script type="text/javascript" src="./lib/js/md5/build/md5.min.js"></script>
-  <script type="text/javascript" src="./lib/js/json2/json2.js"></script>
-
-  <script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
-  <script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
-
-  <script type="text/javascript" src="./assets/js/AvenuOrkut.js"></script>
-
-  <script type="application/javascript">
-
-    function makeAjaxCall(url, type, title, data) {
-      var options = {
-        method: type,
-        success: function(response) {
-          $('#requester').html(title);
-          try{
-            $('.requestResult').html(JSON.stringify(response));
-          } catch(error) {
-            $('.requestResult').html(response);
-          }
-
-        },
-        error:function(request, status, error) {
-          alert('An error has occured ' + error + '. Status: ' + status);
-        }
-      };
-
-      if(data) {
-        options.dataType = 'json';
-        options.data = data;
-      }
-      $.ajax(url, options);
-    };
-
-    function makeFormCall(form, event, type, title, url){
-      event.preventDefault();
-
-      var data = form.serialize();
-
-      if(!url){
-        url = form.attr("action");
-      }
-
-      makeAjaxCall(url, type, title, data);
-    }
-
-    function listAllUsers() {
-      makeAjaxCall('/users', 'GET', 'List All Users');
-    };
-
-    function getUserById() {
-      makeAjaxCall('/users/' + $('#userId').val(), 'GET', 'Get User By Id');
-    };
-
-    function searchByName() {
-      makeAjaxCall('/users?q=' + $('#queryUserName').val(), 'GET', 'Search User By name');
-    };
-
-    function deleteUserById() {
-      makeAjaxCall('/users/' + $('#userId').val(), 'DELETE', 'Delete User By Id');
-    };
-
-    function updatePasswordById() {
-      makeAjaxCall('/users/' + $('#passwordUserId').val() + '/password', 'PUT', 'Update Password By Id');
-    };
-
-    function getMe() {
-      makeAjaxCall('/users/me', 'GET', 'Get Current Logged User');
-    }
-
-    function logout() {
-      if($.removeCookie('socialAPI')) {
-        $('#requester').html('Log Out.');
-        $('.requestResult').html('Logged Out.');
-      } else {
-        $('#requester').html('Log Out.');
-        $('.requestResult').html('Could not remove cookie.');
-      }
-
-    };
-
-    $('#login').submit(function(event){
-      event.preventDefault();
-
-      var options = {
-        method: 'POST',
-        dataType: 'json',
-        data: $(this).serialize(),
-        success: function(token) {
-          $('#requester').html('Log In');
-          $('.requestResult').html(token);
-
-          $.cookie('socialAPI', token);
-
-        },
-        error:function(request, status, error) {
-          alert('An error has occured ' + error + '. Status: ' + status);
-        }
-      };
-
-      $.ajax($(this).attr('action'), options);
-    });
-
-    $('#createUser').submit(function(event) {
-      makeFormCall($(this), event, 'POST', 'Create User');
-    });
-
-    $('#changePassword').submit(function(event) {
-      var form = $(this);
-      var url = form.attr("action") + '/' + $('#passwordUserId').val() + '/password';
-      makeFormCall(form, event, 'PUT', 'Change Password', url);
-    });    
-
-  </script>
-</body>
+		<script src="assets/js/AvenuOrkut.js"></script>
+	</body>
 </html>
