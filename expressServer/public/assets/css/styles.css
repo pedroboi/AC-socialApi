@@ -316,10 +316,10 @@ small.text-muted {
   border-top-right-radius: 0;
 }
 
-#allUsers > div {
+.user-div {  
   margin-bottom: 10px;
 }
 
-#allUsers a {
+.user-div a {
   font-size: 12px;
 }
