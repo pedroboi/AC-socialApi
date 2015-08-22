@@ -323,3 +323,8 @@ small.text-muted {
 .user-div a {
   font-size: 12px;
 }
+
+.user-name {
+  max-height: 1.4em;
+  overflow: hidden;
+}
