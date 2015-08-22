@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<title>Faceboot - A Facebook style template for Bootstrap</title>
+	<meta name="generator" content="Bootply" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="lib/css/bootstrap.min.css" rel="stylesheet" />
+<!--[if lt IE 9]>
+<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<link href="assets/css/styles.css" rel="stylesheet" />
+<link href="assets/css/exercises.css" rel="stylesheet" />
+</head>
+<body>	
+
+	<!-- script references -->
+	<script type="text/javascript" src="lib/js/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
+			
+	<script type="text/javascript" src="./lib/js/json2/json2.js"></script>
+	<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
+	<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
+
+<script>
+
+var MyModel = Backbone.Model.extend({
+	defaults: {
+		name: 'Eduardo',
+		email: 'meu@email.com'	
+	},
+	initialize: function(){
+		this.on({ 
+			'change:name': this.nameChanged,
+			'invalid': this.invalid 
+		});
+	},
+	nameChanged: function( model, options ){
+		console.log( 'Changed:', this.changedAttributes() );
+		console.log( 'Previous:', this.previous('name'), 'New:', this.attributes.name );
+	},
+	invalid: function() {
+		console.log( this.validationError );
+	},
+	validate: function(attrs, options) {
+        if ( !attrs.name || attrs.name === '') {
+            return "The name cannot be empty.";
+        }
+    }
+});
+
+var model = new MyModel();
+
+console.log('Model Attributes: ', model.attributes );
+
+model.set({name: 'Eddie'});
+
+var model2 = new MyModel({ name: 'Dudu' });
+
+console.log('Model Attributes: ', model2.attributes );
+
+model2.set({name:''},{validate: true});
+
+console.log('Model Attributes: ', model2.attributes );
+
+</script>
+
+		
+	</body>
+	</html>
