@@ -1,249 +1,297 @@
+//=====================================[ MODELS ]=====================================
+
 var UserModel = Backbone.Model.extend({
-	url: '/users/me',
-	defaults: {
-		"name": "Default Name",
-		"email": "default@email.com"
-	},
-	parse: function ( response ) {
-		response.md5 = md5( response.email );
-		response.id = response._id;
-		delete response._id;
-		return response;
-	}
+  url: '/users/me',
+  idAttribute: '_id',
+  defaults: {
+    "name": "Default Name",
+    "email": "default@email.com"
+  },
+  validate: function(data) {
+    var emailRegex = /^[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}$/,
+        errors = [];
+
+    if(data.name.length === 0) {
+      errors.push('Invalid username.');
+    } else if(data.name.length > 50) {
+      errors.push('O nome deve conter no máximo 50 caracteres.');
+    }
+
+    if(!emailRegex.test(data.email)) {
+      errors.push('Invalid email');
+    }
+
+    return errors.length ? errors : null;
+  },
+  parse: function (response) {
+    var name = response.name || this.defaults.name,
+        tokens = name.split(' ');
+
+    response.firstname = tokens[0];
+    response.lastname = tokens.length > 1 ? tokens[tokens.length - 1] : '';
+
+    return response;
+  }
 });
 
 var FriendshipModel = Backbone.Model.extend({
-	urlRoot: '/friendships',
-	sync: function(method, model, options) {
-		options || (options = {});
-		switch(method){
-			case 'create':
-			options.url = this.urlRoot + '/' + model.attributes.friendID;
-			break;
-		}
-		return Backbone.sync(method, model, options);
-	}
+  urlRoot: '/friendships',
+  sync: function(method, model, options) {
+    options || (options = {});
+    switch(method){
+      case 'create':
+      options.url = this.urlRoot + '/' + model.attributes.friendID;
+      break;
+    }
+    return Backbone.sync(method, model, options);
+  }
+});
+
+//==================================[ COLLECTIONS ]===================================
+
+var AvailableUsersList = Backbone.Collection.extend({
+  url: '/users/available',
+  model: UserModel
+});
+
+var FriendsRequestsList = Backbone.Collection.extend({
+  url: '/friendships/requests',
+  model: FriendshipModel
+});
+
+var FriendsRequestedList = Backbone.Collection.extend({
+  url: '/friendships/requested',
+  model: FriendshipModel
 });
 
 var FriendsList = Backbone.Collection.extend({
-	url: '/friendships/me'
+  url: '/friendships/me',
+  model: FriendshipModel
 });
 
-var FriendsRequests = Backbone.Collection.extend({
-	url: '/friendships'
-});
-
-var UsersList = Backbone.Collection.extend({
-	url: '/users',
-	model: UserModel,
-	initialize: function( options ) {
-		this.exclude = options.exclude;
-		this.include = options.include;
-	},
-	parse: function( response ) {
-		var selected = [],
-			that = this;
-		if( this.exclude ) {
-			$.each( response, function(index, model) {
-				if( $.inArray( model._id, that.exclude ) == -1 ) {       
-	       			selected.push( model );       
-	       		}
-	   		});
-		}
-		else if( this.include ) {
-			$.each( response, function(index, model) {
-				if( $.inArray( model._id, that.include ) != -1 ) {       
-	       			selected.push( model );       
-	       		}
-	   		});
-		}
-		else {
-			selected = response;
-		}
-   		return selected;
-	}
-});
-
-var UserTemplate = _.template('<div class="col-sm-3 user-div" id="user_<%= id %>"">' + 
-	'<img class="img-responsive" src="http://www.gravatar.com/avatar/<%= md5 %>.jpg?s=100">' + 
-	'<%= name %><br><a class="addFriend" href="#"> + amigo </a></span></div>');
-
-var FriendRequestTemplate = _.template('<div class="col-sm-3 user-div" id="user_<%= id %>"">' + 
-	'<img class="img-responsive" src="http://www.gravatar.com/avatar/<%= md5 %>.jpg?s=100">' + 
-	'<%= name %><br><a class="acceptFriend" href="#"> aceitar pedido </a></span></div>');
-
-var SimpleUserTemplate = _.template('<div class="col-sm-4 user-div" id="user_<%= id %>"">' + 
-	'<img class="img-responsive" src="http://www.gravatar.com/avatar/<%= md5 %>.jpg?s=100">' + 
-	'<%= name %></div>');
-
-
-var CollectionView = Backbone.View.extend({
-	initialize: function(options) {
-		this.template = options.template;
-		this.listenTo(this.collection, "sync", this.render);
-		this.collection.fetch();
-	},
-	render: function() {
-		var self = this;
-		this.$el.html('');
-		this.collection.forEach(function(user, index){
-			if( index < 8 ) {
-				self.$el.append( self.template( user.attributes ) );
-			}
-		});
-	}
-});
-
-var UsersCollectionView = CollectionView.extend({
-	events: {
-		'click .inviteFriend': 'inviteFriend',
-		'click .acceptFriend': 'acceptFriend'
-	},
-	inviteFriend: function (event) {
-		console.log('invite friend', event);
-		var index = this.$el.find('a.addFriend').index(event.currentTarget);
-		var user = this.collection.at(index);
-		var friend = new FriendshipModel( { friendID: user.get('id') } );
-		friend.save();
-	},
-	acceptFriend: function(event){
-		console.log('accept friend', event);
-		var index = this.$el.find('a.addFriend').index(event.currentTarget);
-		var user = this.collection.at(index);
-		var friend = new FriendshipModel( { id: user.get('id') } );
-		friend.save();
-	}
-});
+//=====================================[ VIEWS ]======================================
 
 var ProfileView = Backbone.View.extend({
-	initialize: function(){
-		if( !this.model.get('id') ) {
-			this.model.fetch();
-		}
-	},
-	loadChildrenViews: function() {
-		var friendships = new FriendsRequests();
-		var myFriendships = new FriendsList();
-		
-		var myID = this.model.get('id');
+  template: _.template($("#profileTemplate").html()),
+  initialize: function(){
+    this.listenTo(this.model, 'sync', this.render);
+    this.listenTo(this.model, 'error', this.render);
+    this.model.fetch();
+  },
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    this.loadChildrenViews();
 
-		this.listenTo( friendships, 'sync', function() {
+    return this;
+  },
+  loadChildrenViews: function() {
+    var availableUsersView = new AvailableUsersView({
+      el: this.$el.find('#allUsers'),
+      collection: new AvailableUsersList()
+    });
 
-			var requestedByMe = _.chain(friendships.models).map(function(req) {
-				if (req.attributes._id.userRequester === myID && req.attributes.status === 0 ) return req.attributes._id.userRequested;
-			}).compact().value();
+    var friendshipRequestsView = new FriendshipRequestsView({
+      el: this.$el.find('#friendRequests'),
+      collection: new FriendsRequestsList()
+    });
 
-			var requestedByOthers = _.chain(friendships.models).map(function(req) {
-				if (req.attributes._id.userRequested === myID && req.attributes.status === 0 ) return req.attributes._id.userRequester;
-			}).compact().value();
+    var friendshipRequestedView = new FriendshipRequestedView({
+      el: this.$el.find('#myRequests'),
+      collection: new FriendsRequestedList()
+    });
 
-			var accepted = _.chain(friendships.models).map(function(req) {
-				if ( req.attributes._id.userRequested === myID && req.attributes.status === 1 ) return req.attributes._id.userRequester;
-				if ( req.attributes._id.userRequester === myID && req.attributes.status === 1 ) return req.attributes._id.userRequested;
-			}).compact().value();		
-
-			var toExclude = requestedByMe.concat(requestedByOthers).concat(accepted);
-			toExclude.push( myID );
-
-			var allUsers = new UsersList({exclude: toExclude});
-			var allUsersView = new UsersCollectionView({ collection: allUsers, el: this.$el.find('#allUsers'), template: UserTemplate });
-
-			var friendRequests = new UsersList({include: requestedByOthers});
-			var friendRequestsView = new UsersCollectionView({ collection: friendRequests, el: this.$el.find('#friendRequests'), template: FriendRequestTemplate });
-
-			var friendRequested = new UsersList({include: requestedByMe});
-			var friendRequestedView = new UsersCollectionView({ collection: friendRequested, el: this.$el.find('#myRequests'), template: SimpleUserTemplate });
-
-		});
-
-		this.listenTo( myFriendships, 'sync', function() {
-
-			var acceptedFriends = _.chain(myFriendships.models).map(function(req) {
-				if ( req.attributes._id.userRequester === myID && req.attributes.status === 1 ) return req.attributes._id.userRequested;
-				if ( req.attributes._id.userRequested === myID && req.attributes.status === 1 ) return req.attributes._id.userRequester;
-			}).compact().value();
-
-			var myFriends = new UsersList({include: acceptedFriends });
-			var myFriendsView = new UsersCollectionView({ collection: myFriends, el: this.$el.find('#myFriends'), template: SimpleUserTemplate });
-		});
-
-		friendships.fetch();
-		myFriendships.fetch();
-	},
-
-	render: function() {
-		// Compile the template using underscore
-      	this.$el.html( $("#profileViewTemplate").html() );
-		this.$el.find('#myProfile .panel-thumbnail').html('<img id="profilePicture" src="http://www.gravatar.com/avatar/' + this.model.get('md5') + '.jpg?s=200" class="img-responsive">')
-		this.$el.find('#myProfile .lead').text( this.model.get('name') );
-
-		this.loadChildrenViews();
-
-		return this;
-	},
-	events: {
-		'click #profilePicture': function( event ) {
-			console.log(this, event, 'clicked profile picture');
-		}
-	}
+    var friendsView = new FriendsView({
+      el: this.$el.find('#myFriends'),
+      collection: new FriendsList()
+    });
+  },
+  error: function() {
+    alert('Ocorreu um error durante à chamada da API');
+  }
 });
 
 var EditProfileView = Backbone.View.extend({
-	render: function() {
-		// Compile the template using underscore
-      	this.$el.html( $("#profileEditTemplate").html() );		
-		return this;
-	}
+  events: {
+    'submit form': 'save'
+  },
+  template: _.template($("#editProfileTemplate").html()),
+  initialize: function() {
+    this.listenTo(this.model, 'sync', this.render);
+    this.listenTo(this.model, 'invalid', this.invalid);
+    this.model.fetch();
+  },
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
+  },
+  save: function(event) {
+    var $form = $(event.currentTarget),
+        data = this.getModelData($form);
+
+    this.model.save(data, {
+      context: this,
+      success: this.success,
+      error: this.error
+    });
+
+    return false;
+  },
+  getModelData: function($form) {
+    return {
+      name: $form.find('#name').val(),
+      email: $form.find('#email').val()
+    };
+  },
+  invalid: function(model, errors) {
+    alert(errors.join('\n'));
+  },
+  success: function() {
+    this.navigate('/', true);
+  },
+  error: function() {
+    alert('Ocorreu um error ao tentar salvar o perfil');
+  }
 });
 
+//================================[ COLLECTION VIEWS ]================================
 
-var AvenuOrkut = new (Backbone.Router.extend({
-	routes: {
-		"edit": "editProfile",
-		"*splat": "viewProfile"
-	},
-	start: function(){
-		Backbone.history.start();
-		console.log('AvenuOrkut started.');
-	},
-	viewProfile: function() {
-		var that = this;
-		var myProfileView;
-		
-		if( !this.myProfile ) {
-			this.myProfile = new UserModel();
-			myProfileView = new ProfileView( { model: this.myProfile } );
-			this.listenTo( this.myProfile, 'sync', function(){ that.setView( myProfileView ) } );
-		}
-		else {
-			myProfileView = new ProfileView( { model: this.myProfile } );
-			this.setView( myProfileView );
-		}		
-	},
-	editProfile: function() {		
-		var editProfileView = new EditProfileView( { model: this.myProfile } );
-		this.setView( editProfileView );			
-	},
-	setView: function( view ){
-		var that = this;
-		if( this.currentView ){
-			this.currentView.$el.fadeOut( function() {
-				that.currentView.remove();
-				that.displayCurrentView( view );
-			});
-		} else {
-			this.displayCurrentView( view );
-		}
-	},
-	displayCurrentView: function( view ){
-		var that = this;
-		if( view ) {
-			this.currentView = view;
-			this.currentView.render().$el.hide();
-			this.currentView.$el.appendTo('#mainViewContainer');
-			that.currentView.$el.fadeIn();
-		}
-	}
-}));
+var CollectionView = Backbone.View.extend({
+  initialize: function() {
+    this.listenTo(this.collection, "sync", this.render);
+    this.collection.fetch();
+  },
+  render: function() {
+    var self = this;
 
-AvenuOrkut.start();
+    this.$el.html('');
+    this.collection.forEach(function(user, index){
+      var json = _.extend(user.toJSON(), { index: index });
+      self.$el.append( self.template(json));
+    });
+  },
+  getClickedItem: function(event) {
+    var $target = $(event.currentTarget),
+        $userDiv = $target.closest('.user-div'),
+        index = $userDiv.data('index'),
+        item = this.collection.at(index);
+
+    return item;
+  }
+});
+
+var AvailableUsersView = CollectionView.extend({
+  events: {
+    'click .inviteFriend': 'inviteFriend'
+  },
+  template: _.template($('#userTemplate').html()),
+  inviteFriend: function (event) {
+    var user = this.getClickedItem(event),
+        friend = new FriendshipModel( { friendID: user.get('_id') });
+
+    friend.save({}, {
+      context: this,
+      success: this.inviteSuccess,
+      error: this.inviteError
+    });
+  },
+  inviteSuccess: function() {
+    this.collection.fetch();
+    Backbone.trigger('inviteSent');
+    alert('Pedido de amizade enviado com sucesso!');
+  },
+  inviteError: function() {
+    alert('Ocorreu um error ao enviar o pedido de amizade');
+  }
+});
+
+var FriendshipRequestsView = CollectionView.extend({
+  events: {
+    'click .acceptFriend': 'acceptFriend'
+  },
+  template: _.template($('#friendRequestTemplate').html()),
+  acceptFriend: function(event){
+    var user = this.getClickedItem(event),
+        friend = new FriendshipModel( { id: user.get('userRequester')._id } );
+
+    friend.save({}, {
+      context: this,
+      success: this.friendAcceptedSuccess
+    });
+  },
+  friendAcceptedSuccess: function() {
+    this.collection.fetch();
+    Backbone.trigger('friendAccepted');
+    alert('Pedido de amizade aceito com sucesso!');
+  },
+  friendAcceptedError: function() {
+    alert('Ocorreu um erro ao aceitar o pedido de amizade');
+  }
+});
+
+var FriendshipRequestedView = CollectionView.extend({
+  events: {
+    'click .cancelRequest': 'cancelRequest'
+  },
+  template: _.template($('#friendRequestedTemplate').html()),
+  initialize: function() {
+    // Calling parent view's method ("inheritance")
+    CollectionView.prototype.initialize.apply(this, arguments);
+
+    this.listenTo(Backbone, 'inviteSent', this.inviteSent);
+  },
+  inviteSent: function() {
+    this.collection.fetch();
+  },
+  cancelRequest: function() {
+    alert('Cancel Request');
+  }
+});
+
+var FriendsView = CollectionView.extend({
+  template: _.template($('#friendTemplate').html()),
+  initialize: function() {
+    // Calling parent view's method ("inheritance")
+    CollectionView.prototype.initialize.apply(this, arguments);
+
+    this.listenTo(Backbone, 'friendAccepted', this.friendAccepted);
+  },
+  friendAccepted: function() {
+    this.collection.fetch();
+  }
+});
+
+//=====================================[ ROUTER ]=====================================
+
+var Router = Backbone.Router.extend({
+  routes: {
+    "": "viewProfile",
+    "edit/:userId": "editProfile"
+  },
+  initialize: function() {
+    Backbone.View.prototype.navigate = this.navigate;
+    Backbone.history.start();
+  },
+  viewProfile: function() {
+    var userModel = new UserModel(),
+        profileView = new ProfileView({ model: userModel });
+    
+    this.setView(profileView);
+  },
+  editProfile: function(userId) {
+    var userModel = new UserModel({ id: userId }),
+        editProfileView = new EditProfileView({ model: userModel });
+
+    this.setView(editProfileView);
+  },
+  setView: function( view ){
+    if( this.currentView ){
+      this.currentView.remove();
+    }
+
+    this.currentView = view;
+    this.currentView.$el.appendTo('#mainViewContainer');
+  }
+});
+
+// Start the router
+var router = new Router();
