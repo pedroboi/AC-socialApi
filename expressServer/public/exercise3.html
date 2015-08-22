@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<title>Faceboot - A Facebook style template for Bootstrap</title>
+	<meta name="generator" content="Bootply" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="lib/css/bootstrap.min.css" rel="stylesheet" />
+<!--[if lt IE 9]>
+<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<link href="assets/css/styles.css" rel="stylesheet" />
+<link href="assets/css/exercises.css" rel="stylesheet" />
+</head>
+<body>
+
+	<div id="myContainer" class="container full"></div>
+	
+	<script type="text/template" id="myMicroTemplate">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4>Header Text</h4>
+		</div>
+		<div class="panel-body">
+			Body Text
+		</div>
+	</div>	
+	</script>		
+
+	<!-- script references -->
+	<script type="text/javascript" src="lib/js/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
+			
+	<script type="text/javascript" src="./lib/js/json2/json2.js"></script>
+	<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
+	<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
+
+<script>
+
+var MyView = Backbone.View.extend({
+	events: {
+		'click div': 'alertPanelBody'
+	},
+	alertPanelBody: function(event) {
+		event.stopPropagation();
+		alert( $(event.currentTarget).text() );
+	},
+	template: _.template( $('#myMicroTemplate').html() ),
+	render: function(){
+		this.$el.html( this.template() );
+		this.$el.appendTo('#myContainer');
+		return this;
+	}
+});
+
+var myViewInstance = new MyView();
+
+myViewInstance.render();
+
+</script>
+
+		
+	</body>
+	</html>
