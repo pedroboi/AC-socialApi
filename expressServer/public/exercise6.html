@@ -26,12 +26,17 @@
 <script>
 
 var UserModel = Backbone.Model.extend({
-	url: '/users/me',
+	urlRoot: '/users/me',
     idAttribute: '_id',
 	initialize: function() {
 		console.log( 'Initialize', this.attributes );
 		this.on('sync', this.debugSync );
 		this.fetch();
+	},
+	parse: function( response ){
+		response.firstname = response.name;
+		response.lastname = response.name;
+		return response;
 	},
 	debugSync: function(model, response, options) {
 		console.log('Sync model', model );
@@ -41,9 +46,6 @@ var UserModel = Backbone.Model.extend({
 });
 
 var user = new UserModel();
-
-
-
 
 </script>
 
