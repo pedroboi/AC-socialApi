@@ -23,49 +23,5 @@
 	<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
 	<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
 
-<script>
-
-var MyModel = Backbone.Model.extend({
-	defaults: {
-		name: 'Eduardo',
-		email: 'meu@email.com'	
-	},
-	initialize: function(){
-		this.on({ 
-			'change:name': this.nameChanged,
-			'invalid': this.invalid 
-		});
-	},
-	nameChanged: function( model, options ){
-		console.log( 'Changed:', this.changedAttributes() );
-		console.log( 'Previous:', this.previous('name'), 'New:', this.attributes.name );
-	},
-	invalid: function() {
-		console.log( this.validationError );
-	},
-	validate: function(attrs, options) {
-        if ( !attrs.name || attrs.name === '') {
-            return "The name cannot be empty.";
-        }
-    }
-});
-
-var model = new MyModel();
-
-console.log('Model Attributes: ', model.attributes );
-
-model.set({name: 'Eddie'});
-
-var model2 = new MyModel({ name: 'Dudu' });
-
-console.log('Model Attributes: ', model2.attributes );
-
-model2.set({name:''},{validate: true});
-
-console.log('Model Attributes: ', model2.attributes );
-
-</script>
-
-		
 	</body>
 	</html>

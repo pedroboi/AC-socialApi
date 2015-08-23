@@ -179,54 +179,6 @@
 
 		<script type="text/javascript" src="./lib/js/underscore/underscore.js"></script>
 		<script type="text/javascript" src="./lib/js/backbone/backbone.js"></script>
-
-<script>
-
-var UserModel = Backbone.Model.extend({
-	url: '/users/me',
-	idAttribute: '_id',
-	initialize: function() {
-		this.fetch();
-	},
-	parse: function (response) {
-		var name = response.name || this.defaults.name,
-		tokens = name.split(' ');
-
-		response.firstname = tokens[0];
-		response.lastname = tokens.length > 1 ? tokens[tokens.length - 1] : '';
-
-		return response;
-	}
-});
-
-var ProfileView = Backbone.View.extend({
-	events: {
-		'submit form': 'save'
-	},
-	template: _.template($("#profileTemplate").html()),
-	initialize: function() {
-		this.listenTo(this.model, 'sync', this.render);
-	},
-	render: function() {
-		this.$el.html( this.template( this.model.attributes ));
-		this.$el.appendTo('#mainViewContainer')
-	},
-	save: function(event) {
-		event.preventDefault();
-		var $form = $(event.currentTarget);
-		this.model.set({
-			name: $form.find('#name').val(),
-      		email: $form.find('#email').val()
-		} );
-		this.model.save();
-	}
-});
-
-var myView = new ProfileView({model: new UserModel()});
-
-
-
-</script>
 		<!-- /javascript -->
 
 	</body>

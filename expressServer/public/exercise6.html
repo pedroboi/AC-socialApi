@@ -22,33 +22,6 @@
 	<script type="text/javascript" src="./lib/js/json2/json2.js"></script>
 	<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
 	<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
-
-<script>
-
-var UserModel = Backbone.Model.extend({
-	urlRoot: '/users/me',
-    idAttribute: '_id',
-	initialize: function() {
-		console.log( 'Initialize', this.attributes );
-		this.on('sync', this.debugSync );
-		this.fetch();
-	},
-	parse: function( response ){
-		response.firstname = response.name;
-		response.lastname = response.name;
-		return response;
-	},
-	debugSync: function(model, response, options) {
-		console.log('Sync model', model );
-		console.log('Sync response', response );
-		console.log('Sync options', options );		 
-	}
-});
-
-var user = new UserModel();
-
-</script>
-
 		
 	</body>
 	</html>

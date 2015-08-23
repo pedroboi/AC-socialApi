@@ -46,46 +46,6 @@
 	<script type="text/javascript" src="./lib/js/json2/json2.js"></script>
 	<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
 	<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
-
-<script>
-
-var MyView = Backbone.View.extend({
-	template: _.template( $('#myMicroTemplate').html() ),
-	render: function(){
-		this.$el.html( this.template() );
-		this.$el.appendTo('#myContainer');
-		return this;
-	}
-});
-
-var MyViewQuery = MyView.extend({
-	render: function(){
-		this.$el.html( this.template() );
-		this.$el.find('.panel-body').text("Let's find out!");
-		this.$el.appendTo('#myContainer');
-		return this;
-	}
-});
-
-var MyViewUnderscore = MyView.extend({
-	template: _.template( $('#myMicroTemplate_').html() ),	
-	render: function(){
-		this.$el.html( this.template({ answer: 'A JavasScript MVC library!' }));		
-		this.$el.appendTo('#myContainer');
-		return this;
-	}
-});
-
-var myViewInstance = new MyView();
-var myViewJ = new MyViewQuery();
-var myView_ = new MyViewUnderscore();
-
-myViewInstance.render();
-myViewJ.render();
-myView_.render();
-
-</script>
-
 		
 	</body>
 	</html>

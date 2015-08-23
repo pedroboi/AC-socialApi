@@ -35,31 +35,6 @@
 	<script type="text/javascript" src="./lib/js/json2/json2.js"></script>
 	<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
 	<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
-
-<script>
-
-var MyView = Backbone.View.extend({
-	events: {
-		'click div': 'alertPanelBody'
-	},
-	alertPanelBody: function(event) {
-		event.stopPropagation();
-		alert( $(event.currentTarget).text() );
-	},
-	template: _.template( $('#myMicroTemplate').html() ),
-	render: function(){
-		this.$el.html( this.template() );
-		this.$el.appendTo('#myContainer');
-		return this;
-	}
-});
-
-var myViewInstance = new MyView();
-
-myViewInstance.render();
-
-</script>
-
 		
 	</body>
 	</html>

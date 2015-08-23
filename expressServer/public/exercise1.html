@@ -27,40 +27,5 @@
 		<script type="text/javascript" src="./lib/js/underscore/underscore-min.js"></script>
 		<script type="text/javascript" src="./lib/js/backbone/backbone-min.js"></script>
 
-<script>
-
-var MyView = Backbone.View.extend({
-	render: function(){
-		this.$el.html('This view does not have an "el" defined.');
-		this.$el.appendTo('body');
-		return this;
-	}
-});
-
-var MyViewOnTheContainer = Backbone.View.extend({
-	el: '#myViewContainer',
-	render: function(){
-		this.$el.html('This view uses a pre-defined element.');		
-		return this;
-	}
-});
-
-
-var myViewInstance = new MyView();
-var myViewContainer = new MyViewOnTheContainer();
-var myViewOtherContainer = new MyViewOnTheContainer({ el: '#anotherContainer' });
-var myViewWithClassName = new MyView({ tagName: 'span', className: 'boxed' })
-
-myViewInstance.render();
-
-myViewContainer.render();
-
-myViewOtherContainer.render();
-
-myViewWithClassName.render();
-
-</script>
-
-		
 	</body>
 	</html>
