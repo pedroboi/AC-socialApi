@@ -86,63 +86,31 @@
 						</div>
 						<div class="panel-body">
 							<p class="lead"><%= firstname %></p>
-							<a href="#edit/<%= _id %>" class="pull-right">editar perfil</a>
+							<a href="#edit" class="pull-right">editar perfil</a>										
 						</div>
 					</div>
-				</div>
-				<div class="col-sm-6">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<form>
-								<div class="form-group">
-									<label for="name">Nome:</label>
-									<input id="name" type="text" class="form-control" value="<%= name %>">
-								</div>
-								<div class="form-group">
-									<label for="email">Email:</label>
-									<input id="email" type="email" class="form-control" value="<%= email %>">
-								</div>
-								<button type="submit" class="btn btn-default">Submit</button>
-							</form>
-						</div>
-					</div>
-				</div>
+				</div>				
 			</div>
 		</script>
 
-		<script type="text/template" id="profileTemplateX">
-<div class="column col-xs-12" id="main">
-  <div class="col-sm-2">
-    <div id="myProfile" class="panel panel-default">
-      <div class="panel-thumbnail">
-        <img id="profilePicture" class="img-responsive"
-        src="http://www.gravatar.com/avatar/.jpg?s=200">
-      </div>
-      <div class="panel-body">
-        <p class="lead"></p>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <form>
-          <div class="form-group">
-            <label for="name">Nome:</label>
-            <input id="name" type="text" class="form-control" value="">
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input id="email" type="email" class="form-control" value="">
-          </div>
-          <button type="button" class="btn btn-default">Submit</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+		<script type="text/template" id="editProfileTemplate">
+			<div class="panel panel-default">
+				<div class="panel-heading"><h4>Editar perfil</h4></div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label for="name">Nome:</label>
+							<input id="name" type="text" class="form-control" value="<%= name %>">
+						</div>
+						<div class="form-group">
+							<label for="email">Email:</label>
+							<input id="email" type="email" class="form-control" value="<%= email %>">
+						</div>
+						<button type="submit" class="btn btn-default">Submit</button>
+					</form>
+				</div>
+			</div>
 		</script>
-		<!-- /templates -->
 
 		<!-- post modal -->
 		<div id="postModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
@@ -201,16 +169,25 @@ var UserModel = Backbone.Model.extend({
 });
 
 var ProfileView = Backbone.View.extend({
-	events: {
-		'submit form': 'save'
-	},
 	template: _.template($("#profileTemplate").html()),
 	initialize: function() {
 		this.listenTo(this.model, 'sync', this.render);
 	},
 	render: function() {
-		this.$el.html( this.template( this.model.attributes ));
-		this.$el.appendTo('#mainViewContainer')
+		this.$el.html( this.template( this.model.attributes ));		
+	}
+});
+
+var EditProfileView = Backbone.View.extend({
+	events: {
+		'submit form': 'save'
+	},
+	template: _.template($("#editProfileTemplate").html()),
+	initialize: function() {
+		this.listenTo(this.model, 'sync', this.render);
+	},
+	render: function() {
+		this.$el.html( this.template( this.model.attributes ));		
 	},
 	save: function(event) {
 		event.preventDefault();
@@ -223,7 +200,37 @@ var ProfileView = Backbone.View.extend({
 	}
 });
 
-var myView = new ProfileView({model: new UserModel()});
+var Router = Backbone.Router.extend({
+  routes: {
+    "edit": "editProfile",
+    "*splat": "viewProfile"
+  },
+  initialize: function() {
+    Backbone.history.start();
+  },
+  viewProfile: function() {
+    var userModel = new UserModel(),
+        profileView = new ProfileView({ model: userModel });
+
+    this.setView(profileView);
+  },
+  editProfile: function(userId) {
+    var userModel = new UserModel({ id: userId }),
+        editProfileView = new EditProfileView({ model: userModel });
+
+    this.setView(editProfileView);
+  },
+  setView: function( view ){
+    if( this.currentView ){
+      this.currentView.remove();
+    }
+    this.currentView = view;
+    this.currentView.$el.appendTo('#mainViewContainer');
+  }
+});
+
+// Start the router
+var router = new Router();
 
 
 
