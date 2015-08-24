@@ -45,6 +45,7 @@ $('#login').submit(function(event){
 			$('#requester').html('Log In');
 			$('.requestResult').html(token);
 			$.cookie('socialAPI', token);
+			window.location.href = 'http://localhost:3000/';
 
 		},
 		error:function(request, status, error) {
