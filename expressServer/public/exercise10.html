@@ -103,14 +103,14 @@
 						<div class="panel-body">
 							<p class="lead">Pedidos de amizade</p>
 							<p>As pessoas abaixo enviaram pedidos de amizade. Cuidado, talvez elas tenham segundas intenções!</p>
-							<div id="friendRequests"></div>
+							<div id="friendRequestsContainer"></div>
 						</div>
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-body">
 							<p class="lead">Aguardando aprovação</p>
 							<p>Você enviou um pedido de amizade para estas pessoas mas elas ainda não aceitaram. Talvez elas não gostem de você!</p>
-							<div id="myRequests"></div>
+							<div id="myRequestsContainer"></div>
 						</div>
 					</div>
 				</div>
@@ -118,7 +118,7 @@
 					<div class="panel panel-default">
 						<div class="panel-body">
 							<p class="lead">Meus amigos</p>
-							<div id="myFriends"></div>
+							<div id="myFriendsContainer"></div>
 						</div>
 					</div>
 				</div>
@@ -250,6 +250,39 @@ var FriendsList = Backbone.Collection.extend({
   url: '/friendships/me'
 });
 
+//================================[ COLLECTION VIEWS ]================================
+
+var CollectionView = Backbone.View.extend({
+	initialize: function() {
+	    this.listenTo(this.collection, "update", this.render);
+	    this.collection.fetch();
+	},
+	render: function() {
+		var self = this;
+		this.$el.html('');
+		console.dir( this.collection.models );
+		this.collection.forEach(function(model, index){      
+			self.$el.append( self.template(model.attributes));
+		});
+	}
+});
+
+var AvailableUsersView = CollectionView.extend({
+    template: _.template($('#availableUsersTemplate').html())    
+});
+
+var FriendsRequestsView = CollectionView.extend({
+    template: _.template($('#friendRequestTemplate').html())    
+});
+
+var FriendshipRequestedView = CollectionView.extend({
+    template: _.template($('#friendRequestedTemplate').html())    
+});
+
+var FriendsView = CollectionView.extend({
+    template: _.template($('#friendTemplate').html())    
+});
+
 //=====================================[ VIEWS ]======================================
 
 var ProfileView = Backbone.View.extend({
@@ -259,7 +292,22 @@ var ProfileView = Backbone.View.extend({
 	    this.model.fetch();	    
 	},
 	loadChildrenViews: function() {
-		var availableUsers = new AvailableUsersView({collection: new AvailableUsersList(), el: '#availableUsersContainer' });
+		var users = new AvailableUsersView({
+				collection: new AvailableUsersList(), 
+				el: '#availableUsersContainer' 
+			}),
+		requests = new FriendsRequestsView({
+			collection: new FriendsRequestsList(), 
+			el: '#friendRequestsContainer' 
+		})
+		requested = new FriendshipRequestedView({
+			collection: new FriendsRequestedList(), 
+			el: '#myRequestsContainer' 
+		}),
+		friends = new FriendsView({
+			collection: new FriendsList(), 
+			el: '#myFriendsContainer' 
+		});
 	},
 	logCollection: function (collection, options) {
 		console.log( options.label, collection.models );
@@ -290,23 +338,6 @@ var EditProfileView = Backbone.View.extend({
       		email: $form.find('#email').val()
 		} );
 		this.model.save();
-	}
-});
-
-//================================[ COLLECTION VIEWS ]================================
-
-var AvailableUsersView = Backbone.View.extend({
-    template: _.template($('#availableUsersTemplate').html()),
-    initialize: function() {
-	    this.listenTo(this.collection, "update", this.render);
-	    this.collection.fetch();
-	},
-	render: function() {
-		var self = this;
-		this.$el.html('');
-		this.collection.forEach(function(model, index){      
-			self.$el.append( self.template(model.attributes));
-		});
 	}
 });
 
