@@ -39,10 +39,10 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-nodemon');
+  // grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-mocha-test');
+  // grunt.loadNpmTasks('grunt-mocha-test');
 
-  grunt.registerTask('serverExpress', ['copy', 'nodemon:express']);
+  grunt.registerTask('serverExpress', ['copy']);
   grunt.registerTask('testExpressServer', ['mochaTest']);
 };
