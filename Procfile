@@ -1,1 +1,1 @@
-web: grunt expressServer
+web: grunt

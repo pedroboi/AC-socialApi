@@ -43,6 +43,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   // grunt.loadNpmTasks('grunt-mocha-test');
 
-  grunt.registerTask('serverExpress', ['copy']);
-  grunt.registerTask('testExpressServer', ['mochaTest']);
+  // grunt.registerTask('serverExpress', ['copy']);
+  // grunt.registerTask('testExpressServer', ['mochaTest']);
+  grunt.registerTask('default', ['copy']);
+
 };
