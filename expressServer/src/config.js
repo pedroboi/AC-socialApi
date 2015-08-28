@@ -1,6 +1,6 @@
 module.exports = {
   host: 'localhost',
-  port: 3000,
+  port: 80,
   secret: 'thisIsASimpleSecret123',
   issuer: 'ACode',
   cookieName:'socialAPI',
