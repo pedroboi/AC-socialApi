@@ -46,6 +46,6 @@ module.exports = function(grunt) {
   grunt.registerTask('serverExpress', ['copy', 'nodemon']);
   // grunt.registerTask('testExpressServer', ['mochaTest']);
   grunt.registerTask('default', ['copy', 'nodemon']);
-  // grunt.registerTask('heroku:production', ['copy', 'nodemon']);
+  grunt.registerTask('heroku:production', ['copy']);
 
 };
